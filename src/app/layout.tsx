@@ -8,9 +8,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+       <UserProvider>
       <body>
-        <UserProvider>{children}</UserProvider>
+       {children}
       </body>
+      </UserProvider>
     </html>
   );
 }

@@ -2,16 +2,42 @@
 
 import { useRouter } from "next/navigation";
 import { Box, Typography, Grid } from "@mui/material";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 export default function HomePage() {
   const router = useRouter();
+  const { user, error, isLoading } = useUser();
 
   const handleOtpClick = () => {
     router.push("/request-otp");
   };
 
   const handleCredentialsClick = () => {
-    router.push("/login");
+
+    if (user) {
+    console.log("User info:", user);
+    (async () => {
+      const res = await fetch("/api/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user.email }),
+      }); 
+
+      const data = await res.json();
+      console.log("API response:", data);
+  
+      if (!res.ok || data.profile_completed === 0) {
+        router.push("/update-profile"); // Redirect to update profile route
+      }
+
+      if (data.profile_completed === 1) {
+        router.push("/profile"); // Redirect to profile route
+      }
+    })();
+  }
+    router.push("/api/auth/login"); // Redirect to Auth0 login route
   };
 
   return (
@@ -45,14 +71,14 @@ export default function HomePage() {
           }}
         >
           <Typography variant="h3" fontWeight="bold">
-            Request OTP
+            Register
           </Typography>
           <Typography variant="h6" sx={{ mt: 2 }}>
-            Don’t have a password yet? Request an OTP to log in.
+            Request OTP to register
           </Typography>
         </Grid>
 
-        {/* Right Side: Login with Credentials */}
+        {/* Right Side: Login with Auth0 */}
         <Grid
           item
           xs={6}
@@ -71,10 +97,10 @@ export default function HomePage() {
           }}
         >
           <Typography variant="h3" fontWeight="bold">
-            Login with Credentials
+            Login
           </Typography>
           <Typography variant="h6" sx={{ mt: 2 }}>
-            Already have an account? Login with your email and password.
+            Login with Auth0
           </Typography>
         </Grid>
       </Grid>

@@ -1,13 +1,11 @@
+// verify-otp.tsx
 "use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Use next/navigation
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,8 +22,7 @@ export default function VerifyOtp() {
 
     if (response.ok) {
       setMessage("OTP verified successfully, redirecting to Auth0 login...");
-      // Redirect to Auth0 login or next step
-      router.push("/api/auth/login"); // Redirect after successful verification
+      window.location.href = "/api/auth/login"; // Redirect to Auth0 login
     } else {
       setMessage(data.message || "OTP verification failed");
     }

@@ -1,35 +1,32 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
+  const { email, firstName, lastName, position } = await req.json();
 
+  try {
+    // Send the data to the PHP backend to update the profile
     const response = await fetch(
-      "http://localhost/auth0app/src/Auth/update-profile.php",
+      "http://localhost/auth0app/src/Auth/updateprofile.php",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ email, firstName, lastName, position }),
       }
     );
 
-    if (!response.ok) {
-      const error = await response.json();
+    const data = await response.json();
+
+    if (response.ok) {
+      return NextResponse.json({ message: "Profile updated successfully." });
+    } else {
       return NextResponse.json(
-        { message: error.message },
-        { status: response.status }
+        { message: data.message || "Failed to update profile." },
+        { status: 400 }
       );
     }
-
-    const data = await response.json();
-    return NextResponse.json({ message: "Profile updated successfully", data });
   } catch (error) {
-    console.error("Error updating profile:", error);
-    return NextResponse.json(
-      { message: "An error occurred while updating profile" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Server error." }, { status: 500 });
   }
 }

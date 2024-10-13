@@ -16,7 +16,9 @@ export default function Profile() {
           <p>Email: {user.email}</p>
         </>
       ) : (
-        <p>No user is logged in</p>
+        <p>
+          No user is logged in {user} {error}
+        </p>
       )}
     </div>
   );
